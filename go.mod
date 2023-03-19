@@ -1,3 +1,3 @@
-module github.com/BoyChai/alerter
+module github.com/BoyChai/Alerter
 
 go 1.19
