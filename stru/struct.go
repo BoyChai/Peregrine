@@ -11,13 +11,14 @@ type Alerter struct {
 	SMTPPasswd   string   `yaml:"smtp_passwd"`
 	SMTPPort     int      `yaml:"smtp_port"`
 	SMTPForm     string   `yaml:"smtp_form"`
+	SMTPTLS      bool     `yaml:"smtp_tls"`
 	Target       []Target `yaml:"target"`
 }
 
 type Target struct {
 	Name      string   `yaml:"name"`
-	EmailTo   []string `yaml:"email_to,omitempty"`
-	WebhookTo []string `yaml:"webhook_to,omitempty"`
+	EmailTo   []string `yaml:"email_to"`
+	WebhookTo []string `yaml:"webhook_to"`
 }
 
 type RuleEntry struct {

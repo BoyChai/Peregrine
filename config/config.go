@@ -2,22 +2,25 @@ package config
 
 import (
 	"log"
+	"os"
 
 	"Peregrine/stru"
 
-	"github.com/spf13/viper"
+	"gopkg.in/yaml.v3"
 )
 
-// 初始化配置
-func InitPeregrine() {
-	viper.SetConfigName("peregrine")
-	viper.SetConfigType("yaml")
-	viper.AddConfigPath(".")
-	if err := viper.ReadInConfig(); err != nil {
-		log.Fatalf("Error reading config file: %s", err)
+// 读取配置
+func ReadConfig() stru.Config {
+
+	data, err := os.ReadFile("peregrine.yaml")
+	if err != nil {
+		log.Fatalln(err)
+
 	}
-	var config stru.Config
-	if err := viper.Unmarshal(&config); err != nil {
-		log.Fatalf("Unable to decode into struct: %v", err)
+	var cfg stru.Config
+	err = yaml.Unmarshal(data, &cfg)
+	if err != nil {
+		log.Fatalln(err)
 	}
+	return cfg
 }

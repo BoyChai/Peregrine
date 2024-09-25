@@ -12,6 +12,7 @@ alerter:
   smtp_passwd: "passwd"
   smtp_port: 25
   smtp_form: "xxx@xxx.com"
+  smtp_tls: true
   target:
     - name: "1111"
       email_to:
