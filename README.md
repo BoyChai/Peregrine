@@ -1,2 +1,2 @@
-# Alerter
-qq、微信、钉钉、飞书、飞机、邮件、api 报警器
+# Peregrine
+Prometheus的告警方是通过Prometheus去检测数据是否符合告警规则，符合后通知Alertmanager，然后Alertmanager通过配置的告警方式发送告警通知。这种方式需要去维护两套配置，一套是Prometheus的告警规则，一套是Alertmanager的告警方式，并且两套配置需要同步，如果配置有误，需要去检查两套配置，这样维护起来比较麻烦。Peregrine通过Prometheus的API获取告警规则，然后直接判断内部规则，直接发起告警通知，省去了维护两套配置的麻烦，监控告警只需要维护Peregrine的配置即可。
