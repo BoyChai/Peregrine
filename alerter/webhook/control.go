@@ -5,6 +5,7 @@ import (
 	"Peregrine/stru"
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 )
@@ -13,11 +14,12 @@ type webhook struct {
 	URL string
 }
 
-var hook *webhook
+var hook webhook
 
 var webhookAlert chan alerter.Alert
 
 func Init(way stru.Way) {
+	fmt.Println(way.WebhookURL)
 	hook.URL = way.WebhookURL
 	webhookAlert = make(chan alerter.Alert)
 	alerter.Alerters[way.Name] = webhookAlert

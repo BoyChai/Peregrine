@@ -1,8 +1,8 @@
 package stru
 
 type Asset struct {
-	Name  string `yaml:"name"`
-	Hosts string `yaml:"hosts"`
+	Name string `yaml:"name"`
+	Host string `yaml:"host"`
 }
 type Alerter struct {
 	Way    []Way    `yaml:"way"`
@@ -32,15 +32,39 @@ type RuleEntry struct {
 }
 type Rule struct {
 	Entry         []RuleEntry `yaml:"entry"`
-	AssetGroup    string      `yaml:"asset_group"`
+	AssetName     string      `yaml:"asset_name"`
 	AlerterTarget string      `yaml:"alerter_target"`
 	AlerterWay    string      `yaml:"alerter_way"` // 添加 alerter_way
 	TriggerCount  int         `yaml:"trigger_count"`
 	ProbeInterval int         `yaml:"probe_interval"`
-	For           string      `yaml:"for"`
+	For           int         `yaml:"for"`
 }
 type Config struct {
 	Asset   []Asset `yaml:"asset"`
 	Alerter Alerter `yaml:"alerter"`
 	Rule    []Rule  `yaml:"rule"`
+}
+
+type AlarmTrigger struct {
+	AlerterTarget string
+	Entry         RuleEntry
+}
+
+type PrometheusResp struct {
+	Status string             `json:"status"`
+	Data   PrometheusRespData `json:"data"`
+}
+
+type PrometheusRespData struct {
+	ResultType string                     `json:"resultType"`
+	Result     []PrometheusRespDataResult `json:"result"`
+}
+
+type PrometheusRespDataResult struct {
+	Metric PrometheusRespDataResultMetric `json:"metric"`
+	Value  []interface{}                  `json:"value"`
+}
+
+type PrometheusRespDataResultMetric struct {
+	Instance string `json:"instance"`
 }

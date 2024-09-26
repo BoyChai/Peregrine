@@ -33,15 +33,15 @@ alerter:
 # 规则配置
 rule:
   - entry:
-      - expr: "100 - (avg by (instance) (irate(node_cpu_seconds_total{mode='idle'}[5m])) * 100)"
-        description: "CPU使用率过高"
+      # - expr: "100 - (avg by (instance) (irate(node_cpu_seconds_total{mode='idle'}[5m])) * 100)"
+      #   description: "CPU使用率过高"
+      #   level: "disaster"
+      - expr: "100 - (avg by (instance) (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes) * 100)>50"
+        description: "内存大于80占用"
         level: "disaster"
-      - expr: "100 - (avg by (instance) (irate(node_cpu_seconds_total{mode='idle'}[5m])) * 100)"
-        description: "CPU使用率过高"
-        level: "disaster"
-    asset_group: "Prometheus_Group1"
+    asset_name: "Prometheus_Group1"
     alerter_target: "mail1"
     alerter_way: "mailway1"
-    trigger_count: 1
+    trigger_count: 2
     probe_interval: 5
-    for: "5m"
+    for: 5
