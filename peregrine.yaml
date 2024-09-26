@@ -1,35 +1,32 @@
 # 资产列表
 asset:
   - name: "Prometheus_Group1"
-    hosts:
-      - "http://localhost:9090"
-      - "http://localhost:9091"
+    hosts: "http://localhost:9090"
 
 # 告警配置
 alerter:
-  smtp_host: "smtp.xxx.com"
-  smtp_username: "username"
-  smtp_passwd: "passwd"
-  smtp_port: 25
-  smtp_form: "xxx@xxx.com"
-  smtp_tls: true
-  target:
-    - name: "1111"
-      email_to:
-        - "xxx@xxx.com"
-        - "xxx@xxx.com"
-      webhook_to:
-        - "http://localhost:8080/webhook"
-        - "http://localhost:8080/webhook2"
-    - name: "2222"
-      email_to:
-        - "xxx@xxx.com"
-        - "xxx@xxx.com"
-    - name: "3333"
-      webhook_to:
-        - "http://localhost:8080/webhook"
-        - "http://localhost:8080/webhook2"
+  way:
+    - name: "mailway1"
+      type: "smtp"
+      smtp_host: "smtp.xxx.com"
+      smtp_username: "username"
+      smtp_passwd: "passwd"
+      smtp_port: 25
+      smtp_form: "xxx@xxx.com"
+      smtp_tls: true
+    - name: "222"
+      type: "dingding"
+      dingding_webhook: "https://oapi.dingtalk.com/robot/send?access_token=xxxx"
 
+  target:
+    - name: "mail1"
+      to:
+        - "xxx@xxx.com"
+        - "xxx@xxx.com"
+    - name: "websocket1"
+      to:
+        - "http://xxx.xxx.com"
+        - "http://xxx.xxx.com"
 # 规则配置
 rule:
   - entry:
@@ -40,7 +37,8 @@ rule:
         description: "CPU使用率过高"
         level: "disaster"
     asset_group: "Prometheus_Group1"
-    alerter_target: "1111"
+    alerter_target: "mail1"
+    alerter_way: "mailway1"
     trigger_count: 1
     probe_interval: 5
     for: "5m"

@@ -16,11 +16,8 @@ type dingding struct {
 var dingdingAlert chan alerter.Alert
 var ding dingding
 
-func Init(alter stru.Alerter) {
-	if alter.DingdingWebhook == "" {
-		return
-	}
-	ding.handler = action.NewDingDingHandleByWebHook(alter.DingdingWebhook)
+func Init(way stru.Way) {
+	ding.handler = action.NewDingDingHandleByWebHook(way.DingdingWebhook)
 
 	dingdingAlert = make(chan alerter.Alert)
 	alerter.Alerters["dingding"] = dingdingAlert

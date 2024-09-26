@@ -19,11 +19,11 @@ var dialer *gomail.Dialer
 
 var mailAlert chan alerter.Alert
 
-func Init(alter stru.Alerter) {
-	mail.Form = alter.SMTPForm
-	dialer = gomail.NewDialer(alter.SMTPHost, alter.SMTPPort, alter.SMTPUsername, alter.SMTPPasswd)
+func Init(way stru.Way) {
+	mail.Form = way.SMTPForm
+	dialer = gomail.NewDialer(way.SMTPHost, way.SMTPPort, way.SMTPUsername, way.SMTPPasswd)
 	dialer.TLSConfig = &tls.Config{
-		InsecureSkipVerify: alter.SMTPTLS,
+		InsecureSkipVerify: way.SMTPTLS,
 	}
 	mailAlert = make(chan alerter.Alert)
 	alerter.Alerters["mail"] = mailAlert
