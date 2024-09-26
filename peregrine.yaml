@@ -17,6 +17,9 @@ alerter:
     - name: "222"
       type: "dingding"
       dingding_webhook: "https://oapi.dingtalk.com/robot/send?access_token=xxxx"
+    - name: "333"
+      type: "webhook"
+      webhook_url: "http://xxx.xxx.com"
 
   target:
     - name: "mail1"

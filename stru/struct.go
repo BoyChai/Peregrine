@@ -18,6 +18,7 @@ type Way struct {
 	SMTPForm        string `yaml:"smtp_form,omitempty"`
 	SMTPTLS         bool   `yaml:"smtp_tls,omitempty"`
 	DingdingWebhook string `yaml:"dingding_webhook,omitempty"`
+	WebhookURL      string `yaml:"webhook_url,omitempty"`
 }
 type Target struct {
 	Name string   `yaml:"name"`
