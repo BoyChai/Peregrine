@@ -20,6 +20,7 @@ var webhookAlert chan alerter.Alert
 func Init(way stru.Way) {
 	hook.URL = way.WebhookURL
 	webhookAlert = make(chan alerter.Alert)
+	alerter.Alerters[way.Name] = webhookAlert
 	go hook.wrok()
 }
 

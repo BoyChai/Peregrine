@@ -20,7 +20,7 @@ func Init(way stru.Way) {
 	ding.handler = action.NewDingDingHandleByWebHook(way.DingdingWebhook)
 
 	dingdingAlert = make(chan alerter.Alert)
-	alerter.Alerters["dingding"] = dingdingAlert
+	alerter.Alerters[way.Name] = dingdingAlert
 	go ding.work()
 }
 

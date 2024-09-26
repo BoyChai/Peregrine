@@ -4,7 +4,7 @@ import "Peregrine/stru"
 
 type Alert struct {
 	Entry  stru.RuleEntry
-	Target []string
+	Target []stru.Target
 }
 
 type alerter map[string]chan Alert
