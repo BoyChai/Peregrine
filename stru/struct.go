@@ -6,13 +6,14 @@ type Asset struct {
 }
 
 type Alerter struct {
-	SMTPHost     string   `yaml:"smtp_host"`
-	SMTPUsername string   `yaml:"smtp_username"`
-	SMTPPasswd   string   `yaml:"smtp_passwd"`
-	SMTPPort     int      `yaml:"smtp_port"`
-	SMTPForm     string   `yaml:"smtp_form"`
-	SMTPTLS      bool     `yaml:"smtp_tls"`
-	Target       []Target `yaml:"target"`
+	DingdingWebhook string   `yaml:"dingding_webhook"`
+	SMTPHost        string   `yaml:"smtp_host"`
+	SMTPUsername    string   `yaml:"smtp_username"`
+	SMTPPasswd      string   `yaml:"smtp_passwd"`
+	SMTPPort        int      `yaml:"smtp_port"`
+	SMTPForm        string   `yaml:"smtp_form"`
+	SMTPTLS         bool     `yaml:"smtp_tls"`
+	Target          []Target `yaml:"target"`
 }
 
 type Target struct {
