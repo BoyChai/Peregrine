@@ -2,6 +2,7 @@ package mail
 
 import (
 	"Peregrine/alerter"
+	"Peregrine/alerter/template"
 	"Peregrine/stru"
 	"crypto/tls"
 	"errors"
@@ -53,7 +54,8 @@ func (s *smtp) send(alert stru.AlarmContext) error {
 	msg.SetHeader("To", to...)
 
 	msg.SetHeader("Subject", "告警")
-	msg.SetBody("text/plain", fmt.Sprintf("Level: %s\nDescription: %s\nExpr: %s", alert.Entry.Level, alert.Entry.Description, alert.Entry.Expr))
+	// msg.SetBody("text/plain", fmt.Sprintf("Level: %s\nDescription: %s\nExpr: %s", alert.Entry.Level, alert.Entry.Description, alert.Entry.Expr))
+	msg.SetBody("text/plain", template.GetMailText(alert))
 	fmt.Println(msg)
 	if err := dialer.DialAndSend(msg); err != nil {
 		fmt.Println(err)
