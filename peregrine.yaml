@@ -1,7 +1,7 @@
 # 资产列表
 asset:
   - name: "Prometheus_Group1"
-    hosts: "http://localhost:9090"
+    host: "http://localhost:9090"
 
 # 告警配置
 alerter:

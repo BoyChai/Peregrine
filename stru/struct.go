@@ -1,5 +1,7 @@
 package stru
 
+import "time"
+
 type Asset struct {
 	Name string `yaml:"name"`
 	Host string `yaml:"host"`
@@ -48,6 +50,10 @@ type Config struct {
 type AlarmTrigger struct {
 	AlerterTarget string
 	Entry         RuleEntry
+	ID            int
+	Time          time.Time
+	Instance      []string
+	Value         []string
 }
 
 type PrometheusResp struct {

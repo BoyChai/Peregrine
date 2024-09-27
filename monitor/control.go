@@ -12,27 +12,52 @@ import (
 	"time"
 )
 
-var alarmChan chan stru.AlarmTrigger
+// 告警
+var alarmChan = make(chan stru.AlarmTrigger)
 
-func Run(ch chan stru.AlarmTrigger, rule []stru.Rule) {
-	if len(rule) == 0 {
+var alertMap = make(map[int]time.Time)
+
+var rule []stru.Rule
+
+func Run(ch chan stru.AlarmTrigger, r []stru.Rule) {
+	if len(r) == 0 {
 		log.Fatalln("没有指定规则。。")
 	}
-	alarmChan = ch
-	for _, r := range rule {
-		go entryProcessor(asset.GetAsset(r.AssetName), r.Entry, r.TriggerCount, r.ProbeInterval)
+	rule = r
+
+	for i, r := range rule {
+		go entryProcessor(asset.GetAsset(r.AssetName), r.AlerterTarget, r.Entry, r.TriggerCount, r.ProbeInterval, i)
+	}
+	go receiver(ch)
+}
+
+func receiver(ch chan stru.AlarmTrigger) {
+
+	for {
+		trigger := <-alarmChan
+		fmt.Println("告警告警2")
+		fmt.Println(trigger.Time.Sub(alertMap[trigger.ID]))
+		fmt.Println(time.Duration(rule[trigger.ID].For) * time.Minute)
+		if trigger.Time.Sub(alertMap[trigger.ID]) > time.Duration(rule[trigger.ID].For)*time.Minute {
+			fmt.Println("告警告警aaa")
+			// 更新告警时间
+			alertMap[trigger.ID] = trigger.Time
+			fmt.Println(trigger)
+			ch <- trigger
+		}
 	}
 }
 
-func entryProcessor(asset string, entrys []stru.RuleEntry, count, interval int) {
+func entryProcessor(asset string, target string, entrys []stru.RuleEntry, count, interval, ruleID int) {
 	if len(entrys) == 0 {
 		log.Fatalln("没有设置条目规则。。")
 	}
 	for _, e := range entrys {
-		go detectionTask(asset, e, count, interval)
+		alertMap[ruleID] = time.Now().Add(-5 * time.Minute)
+		go detectionTask(asset, target, e, count, interval, ruleID)
 	}
 }
-func detectionTask(asset string, rule stru.RuleEntry, count, interval int) {
+func detectionTask(asset string, target string, rule stru.RuleEntry, count, interval, ruleID int) {
 	// 内部计数器，用于判断是否触发报警
 	var errorCount int = 0
 	uri := "/api/v1/query"
@@ -40,8 +65,6 @@ func detectionTask(asset string, rule stru.RuleEntry, count, interval int) {
 	urlWithQuery := fmt.Sprintf("%s?query=%s", asset+uri, encodedQuery)
 
 	for {
-		fmt.Println("=============")
-		fmt.Println(errorCount)
 		var lock bool = false
 		time.Sleep(time.Duration(interval) * time.Second)
 
@@ -64,10 +87,25 @@ func detectionTask(asset string, rule stru.RuleEntry, count, interval int) {
 		if !lock && respData.Data.Result != nil {
 			errorCount++
 		}
+		// 告警返回内容
 		if errorCount >= count {
-			fmt.Println("触发报警")
-			fmt.Println(respData.Data.Result[0].Metric.Instance)
-			fmt.Println(respData.Data.Result[0].Value[1])
+			fmt.Println("告警告警1")
+			var trigger = stru.AlarmTrigger{
+				AlerterTarget: target,
+				Entry:         rule,
+				ID:            ruleID,
+				Time:          time.Now(),
+			}
+			if len(respData.Data.Result) != 0 {
+				for _, v := range respData.Data.Result {
+					trigger.Instance = append(trigger.Instance, v.Metric.Instance)
+					trigger.Value = append(trigger.Value, fmt.Sprintf("%v", v.Value[0]))
+					trigger.Value = append(trigger.Value, fmt.Sprintf("%v", v.Value[1]))
+				}
+			}
+			fmt.Println("告警触发条件满足")
+			alarmChan <- trigger
+			fmt.Println("告警发送成功")
 			errorCount = 0
 			continue
 		}
