@@ -2,12 +2,7 @@ package alerter
 
 import "Peregrine/stru"
 
-type Alert struct {
-	Entry  stru.RuleEntry
-	Target []stru.Target
-}
-
-type alerter map[string]chan Alert
+type alerter map[string]chan stru.AlarmContext
 
 var Alerters alerter
 

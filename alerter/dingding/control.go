@@ -13,13 +13,13 @@ type dingding struct {
 	handler *action.DingDingHandle
 }
 
-var dingdingAlert chan alerter.Alert
+var dingdingAlert chan stru.AlarmContext
 var ding dingding
 
 func Init(way stru.Way) {
 	ding.handler = action.NewDingDingHandleByWebHook(way.DingdingWebhook)
 
-	dingdingAlert = make(chan alerter.Alert)
+	dingdingAlert = make(chan stru.AlarmContext)
 	alerter.Alerters[way.Name] = dingdingAlert
 	go ding.work()
 }

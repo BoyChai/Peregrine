@@ -26,7 +26,7 @@ func Run(ch chan stru.AlarmTrigger, r []stru.Rule) {
 	rule = r
 
 	for i, r := range rule {
-		go entryProcessor(asset.GetAsset(r.AssetName), r.AlerterTarget, r.Entry, r.TriggerCount, r.ProbeInterval, i)
+		go entryProcessor(asset.GetAsset(r.AssetName), r.AlerterTarget, r.AlerterWay, r.Entry, r.TriggerCount, r.ProbeInterval, i)
 	}
 	go receiver(ch)
 }
@@ -48,16 +48,16 @@ func receiver(ch chan stru.AlarmTrigger) {
 	}
 }
 
-func entryProcessor(asset string, target string, entrys []stru.RuleEntry, count, interval, ruleID int) {
+func entryProcessor(asset, target, way string, entrys []stru.RuleEntry, count, interval, ruleID int) {
 	if len(entrys) == 0 {
 		log.Fatalln("没有设置条目规则。。")
 	}
 	for _, e := range entrys {
 		alertMap[ruleID] = time.Now().Add(-5 * time.Minute)
-		go detectionTask(asset, target, e, count, interval, ruleID)
+		go detectionTask(asset, target, way, e, count, interval, ruleID)
 	}
 }
-func detectionTask(asset string, target string, rule stru.RuleEntry, count, interval, ruleID int) {
+func detectionTask(asset, target, way string, rule stru.RuleEntry, count, interval, ruleID int) {
 	// 内部计数器，用于判断是否触发报警
 	var errorCount int = 0
 	uri := "/api/v1/query"
@@ -92,6 +92,7 @@ func detectionTask(asset string, target string, rule stru.RuleEntry, count, inte
 			fmt.Println("告警告警1")
 			var trigger = stru.AlarmTrigger{
 				AlerterTarget: target,
+				AlerterWay:    way,
 				Entry:         rule,
 				ID:            ruleID,
 				Time:          time.Now(),

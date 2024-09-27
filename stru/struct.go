@@ -48,7 +48,9 @@ type Config struct {
 }
 
 type AlarmTrigger struct {
+	AssetName     string
 	AlerterTarget string
+	AlerterWay    string
 	Entry         RuleEntry
 	ID            int
 	Time          time.Time
@@ -73,4 +75,19 @@ type PrometheusRespDataResult struct {
 
 type PrometheusRespDataResultMetric struct {
 	Instance string `json:"instance"`
+}
+
+type AlarmContext struct {
+	// 资产名字
+	Asset string
+	// 告警器名字
+	Way string
+	// 告警目标
+	Target Target
+	// 告警相关规则信息
+	Entry RuleEntry
+	// 触发主机
+	Instance []string
+	// 出发值
+	Value []string
 }

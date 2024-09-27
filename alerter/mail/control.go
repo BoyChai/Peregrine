@@ -18,7 +18,7 @@ var mail smtp
 
 var dialer *gomail.Dialer
 
-var mailAlert chan alerter.Alert
+var mailAlert chan stru.AlarmContext
 
 func Init(way stru.Way) {
 	mail.Form = way.SMTPForm
@@ -26,7 +26,7 @@ func Init(way stru.Way) {
 	dialer.TLSConfig = &tls.Config{
 		InsecureSkipVerify: way.SMTPTLS,
 	}
-	mailAlert = make(chan alerter.Alert)
+	mailAlert = make(chan stru.AlarmContext)
 	alerter.Alerters[way.Name] = mailAlert
 	go mail.work()
 }
@@ -40,16 +40,15 @@ func (s *smtp) work() error {
 		}
 	}
 }
-func (s *smtp) send(alert alerter.Alert) error {
-
+func (s *smtp) send(alert stru.AlarmContext) error {
 	msg := gomail.NewMessage()
 	msg.SetHeader("From", s.Form)
 	var to []string
-	if len(alert.Target) <= 0 {
+	if len(alert.Target.To) <= 0 {
 		return errors.New("没有目标邮箱")
 	}
-	for _, v := range alert.Target {
-		to = append(to, v.To...)
+	for _, v := range alert.Target.To {
+		to = append(to, v)
 	}
 	msg.SetHeader("To", to...)
 
@@ -57,7 +56,7 @@ func (s *smtp) send(alert alerter.Alert) error {
 	msg.SetBody("text/plain", fmt.Sprintf("Level: %s\nDescription: %s\nExpr: %s", alert.Entry.Level, alert.Entry.Description, alert.Entry.Expr))
 	fmt.Println(msg)
 	if err := dialer.DialAndSend(msg); err != nil {
-		panic(err)
+		fmt.Println(err)
 	}
 	fmt.Println("发送成功")
 	return nil

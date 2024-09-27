@@ -16,12 +16,12 @@ type webhook struct {
 
 var hook webhook
 
-var webhookAlert chan alerter.Alert
+var webhookAlert chan stru.AlarmContext
 
 func Init(way stru.Way) {
 	fmt.Println(way.WebhookURL)
 	hook.URL = way.WebhookURL
-	webhookAlert = make(chan alerter.Alert)
+	webhookAlert = make(chan stru.AlarmContext)
 	alerter.Alerters[way.Name] = webhookAlert
 	go hook.wrok()
 }
@@ -31,20 +31,19 @@ func (w *webhook) wrok() {
 		select {
 		case alert := <-webhookAlert:
 			msg, _ := json.Marshal(alert.Entry)
-			if len(alert.Target) <= 0 {
+			if len(alert.Target.To) <= 0 {
 				return
 			}
-			for _, v := range alert.Target {
-				d, d2, e := w.send(msg, v)
-				if e != nil {
-					log.Println(e)
-				}
-				log.Println(d, d2)
+			d, d2, e := w.send(msg)
+
+			if e != nil {
+				log.Println(e)
 			}
+			log.Println(d, d2)
 		}
 	}
 }
-func (w *webhook) send(msg []byte, target stru.Target) (statusCode int, bodyData string, err error) {
+func (w *webhook) send(msg []byte) (statusCode int, bodyData string, err error) {
 	resp, err := http.Post(w.URL, "application/json", bytes.NewBuffer(msg))
 	if err != nil {
 		return 0, "", err
