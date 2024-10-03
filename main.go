@@ -1,11 +1,9 @@
 package main
 
 import (
-	"Peregrine/config"
-	"fmt"
+	"Peregrine/control"
 )
 
 func main() {
-	config.InitPeregrine()
-	fmt.Println("Hello Peregrine")
+	control.InitPeregrine()
 }
