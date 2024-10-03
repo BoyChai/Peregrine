@@ -2,6 +2,7 @@ package log
 
 import (
 	"Peregrine/stru"
+	"encoding/json"
 	"log"
 	"os"
 	"runtime"
@@ -66,6 +67,13 @@ const (
 	colorGray = "\033[90m"
 )
 
+type jsonMsg struct {
+	Level   string `json:"level"`
+	Msg     string `json:"msg"`
+	Time    int64  `json:"time"`
+	Details any    `json:"details,omitempty"` // 可选字段
+}
+
 func InitLogOut(cfg stru.Log) {
 	fileLock = sync.RWMutex{}
 	setLevel(cfg.Level)
@@ -112,7 +120,8 @@ func Debug(format string, v ...any) {
 			debugFileLogger.Printf(format, v...)
 		}
 		if jsonStatus {
-			debugJsonLogger.Printf(format, v...)
+			str := getJsonDataStr("debug", format, v...)
+			debugJsonLogger.Printf(str)
 		}
 	}
 }
@@ -124,7 +133,8 @@ func Info(format string, v ...any) {
 			infoFileLogger.Printf(format, v...)
 		}
 		if jsonStatus {
-			infoJsonLogger.Printf(format, v...)
+			str := getJsonDataStr("info", format, v...)
+			infoJsonLogger.Printf(str)
 		}
 	}
 }
@@ -136,7 +146,8 @@ func Warn(format string, v ...any) {
 			warnFileLogger.Printf(format, v...)
 		}
 		if jsonStatus {
-			warnJsonLogger.Printf(format, v...)
+			str := getJsonDataStr("warn", format, v...)
+			warnJsonLogger.Printf(str)
 		}
 	}
 }
@@ -148,7 +159,8 @@ func Error(format string, v ...any) {
 			errorFileLogger.Printf(format, v...)
 		}
 		if jsonStatus {
-			errorJsonLogger.Printf(format, v...)
+			str := getJsonDataStr("error", format, v...)
+			errorJsonLogger.Printf(str)
 		}
 	}
 }
@@ -160,7 +172,8 @@ func Fatal(format string, v ...any) {
 			fatalFileLogger.Printf(format, v...)
 		}
 		if jsonStatus {
-			fatalJsonLogger.Printf(format, v...)
+			str := getJsonDataStr("fatal", format, v...)
+			fatalJsonLogger.Printf(str)
 		}
 	}
 }
@@ -224,11 +237,25 @@ func initLog(logOut, logJsonOut *os.File) {
 
 	// json格式Logger
 	if jsonStatus {
-		infoJsonLogger = log.New(logOut, "", log.LstdFlags)
-		debugJsonLogger = log.New(logOut, "", log.LstdFlags)
-		warnJsonLogger = log.New(logOut, "", log.LstdFlags)
-		errorJsonLogger = log.New(logOut, "", log.LstdFlags)
-		fatalJsonLogger = log.New(logOut, "", log.LstdFlags)
+		infoJsonLogger = log.New(logOut, "", 0)
+		debugJsonLogger = log.New(logOut, "", 0)
+		warnJsonLogger = log.New(logOut, "", 0)
+		errorJsonLogger = log.New(logOut, "", 0)
+		fatalJsonLogger = log.New(logOut, "", 0)
 	}
 
+}
+
+func getJsonDataStr(level, msg string, details ...any) string {
+	data := jsonMsg{
+		Level:   level,
+		Msg:     msg,
+		Details: details,
+		Time:    time.Now().Unix(),
+	}
+	byt, err := json.Marshal(data)
+	if err != nil {
+		log.Println("出大问题，json数据格式化失败，日志系统出现问题，请联系管理员....")
+	}
+	return string(byt)
 }
