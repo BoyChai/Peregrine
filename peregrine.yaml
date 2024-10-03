@@ -1,6 +1,13 @@
+# 日志配置
+log:
+  level: 1
+  file: true
+  json: true
+  path: "./logs"
+
 # 资产列表
 asset:
-  - name: "Prometheus_Group1"
+  - name: "asset1"
     host: "http://localhost:9090"
 
 # 告警配置
@@ -39,7 +46,7 @@ rule:
       - expr: "100 - (avg by (instance) (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes) * 100)>50"
         description: "内存大于80占用"
         level: "disaster"
-    asset_name: "Prometheus_Group1"
+    asset_name: "asset1"
     alerter_target: "mail1"
     alerter_way: "mailway1"
     trigger_count: 2

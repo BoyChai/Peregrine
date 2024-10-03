@@ -2,6 +2,13 @@ package stru
 
 import "time"
 
+type Log struct {
+	File  bool   `yaml:"file"`
+	Path  string `yaml:"path"`
+	Json  bool   `yaml:"json"`
+	Level int    `yaml:"level"`
+}
+
 type Asset struct {
 	Name string `yaml:"name"`
 	Host string `yaml:"host"`
@@ -42,6 +49,7 @@ type Rule struct {
 	For           int         `yaml:"for"`
 }
 type Config struct {
+	Log     Log     `yaml:"log"`
 	Asset   []Asset `yaml:"asset"`
 	Alerter Alerter `yaml:"alerter"`
 	Rule    []Rule  `yaml:"rule"`

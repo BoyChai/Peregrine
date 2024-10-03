@@ -7,9 +7,9 @@ import (
 	"Peregrine/alerter/webhook"
 	"Peregrine/asset"
 	"Peregrine/config"
+	"Peregrine/log"
 	"Peregrine/monitor"
 	"Peregrine/stru"
-	"log"
 )
 
 var TriggerChan chan stru.AlarmTrigger
@@ -18,6 +18,8 @@ var TriggerChan chan stru.AlarmTrigger
 
 func InitPeregrine() {
 	cfg := config.ReadConfig()
+	// 配置日志
+	log.InitLogOut(cfg.Log)
 	// 注册资产
 	asset.Init(cfg.Asset)
 
