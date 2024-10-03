@@ -2,11 +2,10 @@ package webhook
 
 import (
 	"Peregrine/alerter"
+	"Peregrine/log"
 	"Peregrine/stru"
 	"bytes"
 	"encoding/json"
-	"fmt"
-	"log"
 	"net/http"
 )
 
@@ -19,7 +18,6 @@ var hook webhook
 var webhookAlert chan stru.AlarmContext
 
 func Init(way stru.Way) {
-	fmt.Println(way.WebhookURL)
 	hook.URL = way.WebhookURL
 	webhookAlert = make(chan stru.AlarmContext)
 	alerter.Alerters[way.Name] = webhookAlert
@@ -34,12 +32,15 @@ func (w *webhook) wrok() {
 			if len(alert.Target.To) <= 0 {
 				return
 			}
-			d, d2, e := w.send(msg)
+			code, body, e := w.send(msg)
 
 			if e != nil {
-				log.Println(e)
+				log.Error(alert.Way+"告警器发送错误", e.Error())
 			}
-			log.Println(d, d2)
+			if code != 200 {
+				log.Error(alert.Way+"告警器发送状态码错误", body)
+			}
+			log.Debug(alert.Way+" 告警器发送成功", body)
 		}
 	}
 }

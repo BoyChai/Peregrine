@@ -3,6 +3,7 @@ package mail
 import (
 	"Peregrine/alerter"
 	"Peregrine/alerter/template"
+	"Peregrine/log"
 	"Peregrine/stru"
 	"crypto/tls"
 	"errors"
@@ -37,7 +38,7 @@ func (s *smtp) work() error {
 		alert := <-mailAlert
 		err := s.send(alert)
 		if err != nil {
-			fmt.Println(err)
+			log.Error(alert.Way+" 发送告警时出现错误", err.Error())
 		}
 	}
 }
@@ -54,12 +55,11 @@ func (s *smtp) send(alert stru.AlarmContext) error {
 	msg.SetHeader("To", to...)
 
 	msg.SetHeader("Subject", "告警")
-	// msg.SetBody("text/plain", fmt.Sprintf("Level: %s\nDescription: %s\nExpr: %s", alert.Entry.Level, alert.Entry.Description, alert.Entry.Expr))
 	msg.SetBody("text/plain", template.GetMailText(alert))
 	fmt.Println(msg)
 	if err := dialer.DialAndSend(msg); err != nil {
-		fmt.Println(err)
+		return err
 	}
-	fmt.Println("发送成功")
+	log.Info(alert.Way + "告警器发送成")
 	return nil
 }

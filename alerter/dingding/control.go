@@ -2,6 +2,7 @@ package dingding
 
 import (
 	"Peregrine/alerter"
+	"Peregrine/log"
 	"Peregrine/stru"
 	"encoding/json"
 	"fmt"
@@ -51,12 +52,14 @@ func (d *dingding) work() {
 					Text:  fmt.Sprintf("Level: %s  \nDescription: %s  \nExpr: %s  \n", alert.Entry.Level, alert.Entry.Description, alert.Entry.Expr),
 				},
 			})
-			d, d2, e := d.handler.SendGroupMessageByWebhook(string(msg))
+			code, body, e := d.handler.SendGroupMessageByWebhook(string(msg))
 			if e != nil {
-				panic(e)
+				log.Error(e.Error())
 			}
-			fmt.Println(d, d2)
+			if code != 200 {
+				log.Error(alert.Way+" 告警器告警失败,状态码错误", body)
+			}
+			log.Debug(alert.Way+" 告警器告警成功", body)
 		}
 	}
-
 }
