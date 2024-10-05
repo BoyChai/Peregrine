@@ -237,11 +237,11 @@ func initLog(logOut, logJsonOut *os.File) {
 
 	// json格式Logger
 	if jsonStatus {
-		infoJsonLogger = log.New(logOut, "", 0)
-		debugJsonLogger = log.New(logOut, "", 0)
-		warnJsonLogger = log.New(logOut, "", 0)
-		errorJsonLogger = log.New(logOut, "", 0)
-		fatalJsonLogger = log.New(logOut, "", 0)
+		infoJsonLogger = log.New(logJsonOut, "", 0)
+		debugJsonLogger = log.New(logJsonOut, "", 0)
+		warnJsonLogger = log.New(logJsonOut, "", 0)
+		errorJsonLogger = log.New(logJsonOut, "", 0)
+		fatalJsonLogger = log.New(logJsonOut, "", 0)
 	}
 
 }

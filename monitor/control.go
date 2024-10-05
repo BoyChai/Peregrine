@@ -2,11 +2,11 @@ package monitor
 
 import (
 	"Peregrine/asset"
+	"Peregrine/log"
 	"Peregrine/stru"
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"net/url"
 	"time"
@@ -21,7 +21,7 @@ var rule []stru.Rule
 
 func Run(ch chan stru.AlarmTrigger, r []stru.Rule) {
 	if len(r) == 0 {
-		log.Fatalln("没有指定规则。。")
+		log.Error("没有指定探测规则。。")
 	}
 	rule = r
 
@@ -35,14 +35,9 @@ func receiver(ch chan stru.AlarmTrigger) {
 
 	for {
 		trigger := <-alarmChan
-		fmt.Println("告警告警2")
-		fmt.Println(trigger.Time.Sub(alertMap[trigger.ID]))
-		fmt.Println(time.Duration(rule[trigger.ID].For) * time.Minute)
 		if trigger.Time.Sub(alertMap[trigger.ID]) > time.Duration(rule[trigger.ID].For)*time.Minute {
-			fmt.Println("告警告警aaa")
 			// 更新告警时间
 			alertMap[trigger.ID] = trigger.Time
-			fmt.Println(trigger)
 			ch <- trigger
 		}
 	}
@@ -50,7 +45,7 @@ func receiver(ch chan stru.AlarmTrigger) {
 
 func entryProcessor(asset, target, way string, entrys []stru.RuleEntry, count, interval, ruleID int) {
 	if len(entrys) == 0 {
-		log.Fatalln("没有设置条目规则。。")
+		log.Error("没有设置条目规则。。")
 	}
 	for _, e := range entrys {
 		alertMap[ruleID] = time.Now().Add(-5 * time.Minute)
@@ -63,25 +58,25 @@ func detectionTask(asset, target, way string, rule stru.RuleEntry, count, interv
 	uri := "/api/v1/query"
 	encodedQuery := url.QueryEscape(rule.Expr) // URL 编码
 	urlWithQuery := fmt.Sprintf("%s?query=%s", asset+uri, encodedQuery)
-
+	log.Debug(urlWithQuery)
 	for {
 		var lock bool = false
 		time.Sleep(time.Duration(interval) * time.Second)
 
 		code, body, err := runDetection(urlWithQuery)
 		if err != nil {
-			log.Println("请求失败", err)
+			log.Error("请求失败", err)
 			errorCount++
 			lock = true
 		}
 		if !lock && code != http.StatusOK {
 			errorCount++
-			log.Println("请求状态码错误", code)
+			log.Error("请求状态码错误", code)
 		}
 		var respData stru.PrometheusResp
 		err = json.Unmarshal([]byte(body), &respData)
 		if !lock && err != nil {
-			log.Println("返回解析失败", err)
+			log.Error("返回解析失败", err)
 			errorCount++
 		}
 		if !lock && respData.Data.Result != nil {
@@ -89,7 +84,7 @@ func detectionTask(asset, target, way string, rule stru.RuleEntry, count, interv
 		}
 		// 告警返回内容
 		if errorCount >= count {
-			fmt.Println("告警告警1")
+			log.Debug("返回告警内容", urlWithQuery)
 			var trigger = stru.AlarmTrigger{
 				AlerterTarget: target,
 				AlerterWay:    way,
@@ -104,9 +99,7 @@ func detectionTask(asset, target, way string, rule stru.RuleEntry, count, interv
 					trigger.Value = append(trigger.Value, fmt.Sprintf("%v", v.Value[1]))
 				}
 			}
-			fmt.Println("告警触发条件满足")
 			alarmChan <- trigger
-			fmt.Println("告警发送成功")
 			errorCount = 0
 			continue
 		}
@@ -116,14 +109,14 @@ func detectionTask(asset, target, way string, rule stru.RuleEntry, count, interv
 func runDetection(url string) (statusCode int, bodyData string, err error) {
 	resp, err := http.Get(url)
 	if err != nil {
-		log.Println("请求失败。。。")
+		log.Error("请求失败。。。")
 		return 0, "", nil
 
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		log.Println("资源请求失败。。")
+		log.Error("资源请求失败。。")
 	}
 
 	var buf bytes.Buffer

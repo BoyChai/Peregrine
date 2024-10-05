@@ -7,7 +7,6 @@ import (
 	"Peregrine/stru"
 	"crypto/tls"
 	"errors"
-	"fmt"
 
 	"gopkg.in/gomail.v2"
 )
@@ -56,7 +55,6 @@ func (s *smtp) send(alert stru.AlarmContext) error {
 
 	msg.SetHeader("Subject", "告警")
 	msg.SetBody("text/plain", template.GetMailText(alert))
-	fmt.Println(msg)
 	if err := dialer.DialAndSend(msg); err != nil {
 		return err
 	}
