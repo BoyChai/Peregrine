@@ -2,10 +2,10 @@ package dingding
 
 import (
 	"Peregrine/alerter"
+	"Peregrine/alerter/template"
 	"Peregrine/log"
 	"Peregrine/stru"
 	"encoding/json"
-	"fmt"
 
 	"github.com/BoyChai/CoralBot/action"
 )
@@ -49,7 +49,7 @@ func (d *dingding) work() {
 					SingleURL   string `json:"singleURL"`
 				}{
 					Title: "监控告警",
-					Text:  fmt.Sprintf("Level: %s  \nDescription: %s  \nExpr: %s  \n", alert.Entry.Level, alert.Entry.Description, alert.Entry.Expr),
+					Text:  template.GetDingDingText(alert),
 				},
 			})
 			code, body, e := d.handler.SendGroupMessageByWebhook(string(msg))

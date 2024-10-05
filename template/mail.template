@@ -1,0 +1,64 @@
+<!-- 此页面由ChatGPT生成 -->
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>告警通知</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #d9534f; /* 红色 */
+        }
+        .alert-item {
+            margin-bottom: 15px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: #f9f9f9;
+        }
+        .alert-item label {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>告警通知</h1>
+    
+    <div class="alert-item">
+        <label>告警资产:</label> {{.Asset}}
+    </div>
+    <div class="alert-item">
+        <label>告警方式:</label> {{.Way}}
+    </div>
+    <div class="alert-item">
+        <label>告警目标:</label> {{.Target.Name}} ({{range .Target.To}}{{.}} {{end}})
+    </div>
+    <div class="alert-item">
+        <label>告警规则:</label> {{.Entry.Description}} (表达式: {{.Entry.Expr}}, 等级: {{.Entry.Level}})
+    </div>
+    <div class="alert-item">
+        <label>触发主机:</label> {{range .Instance}}{{.}} {{end}}
+    </div>
+    <div class="alert-item">
+        <label>当前值:</label> {{range .Value}}{{.}} {{end}}
+    </div>
+</div>
+
+</body>
+</html>

@@ -176,6 +176,7 @@ func Fatal(format string, v ...any) {
 			fatalJsonLogger.Printf(str)
 		}
 	}
+	os.Exit(1)
 }
 
 func getCallTrace() (string, int) {

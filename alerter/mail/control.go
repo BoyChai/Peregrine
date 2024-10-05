@@ -35,6 +35,7 @@ func Init(way stru.Way) {
 func (s *smtp) work() error {
 	for {
 		alert := <-mailAlert
+		log.Debug(alert.Way + "收到告警，正在发送告警")
 		err := s.send(alert)
 		if err != nil {
 			log.Error(alert.Way+" 发送告警时出现错误", err.Error())
@@ -54,7 +55,7 @@ func (s *smtp) send(alert stru.AlarmContext) error {
 	msg.SetHeader("To", to...)
 
 	msg.SetHeader("Subject", "告警")
-	msg.SetBody("text/plain", template.GetMailText(alert))
+	msg.SetBody("text/html", template.GetMailText(alert))
 	if err := dialer.DialAndSend(msg); err != nil {
 		return err
 	}

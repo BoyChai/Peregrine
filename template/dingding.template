@@ -1,0 +1,20 @@
+# 告警信息
+
+## 资产
+**资产名称:** {{.Asset}}
+
+## 告警详情
+- **告警方式:** {{.Way}}
+- **告警目标:** {{.Target.Name}} 
+  - **接收者:** {{range .Target.To}}{{.}} {{end}}
+
+## 告警规则
+- **描述:** {{.Entry.Description}}
+- **表达式:** `{{.Entry.Expr}}`
+- **等级:** {{.Entry.Level}}
+
+## 触发主机
+**主机列表:** {{range .Instance}}{{.}} {{end}}
+
+## 当前值
+**告警值:** {{range .Value}}{{.}} {{end}}

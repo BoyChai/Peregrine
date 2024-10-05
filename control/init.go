@@ -4,6 +4,7 @@ import (
 	"Peregrine/alerter"
 	"Peregrine/alerter/dingding"
 	"Peregrine/alerter/mail"
+	"Peregrine/alerter/template"
 	"Peregrine/alerter/webhook"
 	"Peregrine/asset"
 	"Peregrine/config"
@@ -23,7 +24,9 @@ func InitPeregrine() {
 	// 注册资产
 	log.Debug("正在注册资产")
 	asset.Init(cfg.Asset)
-
+	// 读取告警模板
+	log.Debug("正在读取告警模板")
+	template.ReadAlerterTemplate()
 	// 注册告警器
 	if len(cfg.Alerter.Way) > 0 {
 		for _, way := range cfg.Alerter.Way {
