@@ -60,7 +60,8 @@ type AlarmTrigger struct {
 	AlerterTarget string
 	AlerterWay    string
 	Entry         RuleEntry
-	ID            int
+	RuleID        int
+	EntryID       int
 	Time          time.Time
 	Instance      []string
 	Value         []string

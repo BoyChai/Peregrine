@@ -26,7 +26,7 @@ func Run(ch chan stru.AlarmTrigger, r []stru.Rule) {
 	rule = r
 
 	for i, r := range rule {
-		go entryProcessor(asset.GetAsset(r.AssetName), r.AlerterTarget, r.AlerterWay, r.Entry, r.TriggerCount, r.ProbeInterval, i)
+		go entryProcessor(r.AssetName, r.AlerterTarget, r.AlerterWay, r.Entry, r.TriggerCount, r.ProbeInterval, i)
 	}
 	go receiver(ch)
 }
@@ -35,29 +35,29 @@ func receiver(ch chan stru.AlarmTrigger) {
 
 	for {
 		trigger := <-alarmChan
-		if trigger.Time.Sub(alertMap[trigger.ID]) > time.Duration(rule[trigger.ID].For)*time.Minute {
+		if trigger.Time.Sub(alertMap[trigger.EntryID]) > time.Duration(rule[trigger.RuleID].For)*time.Minute {
 			// 更新告警时间
-			alertMap[trigger.ID] = trigger.Time
+			alertMap[trigger.EntryID] = trigger.Time
 			ch <- trigger
 		}
 	}
 }
 
-func entryProcessor(asset, target, way string, entrys []stru.RuleEntry, count, interval, ruleID int) {
+func entryProcessor(assetName, target, way string, entrys []stru.RuleEntry, count, interval, ruleID int) {
 	if len(entrys) == 0 {
 		log.Error("没有设置条目规则。。")
 	}
-	for _, e := range entrys {
-		alertMap[ruleID] = time.Now().Add(-5 * time.Minute)
-		go detectionTask(asset, target, way, e, count, interval, ruleID)
+	for id, e := range entrys {
+		alertMap[id] = time.Now().Add(-5 * time.Minute)
+		go detectionTask(assetName, target, way, e, count, interval, ruleID, id)
 	}
 }
-func detectionTask(asset, target, way string, rule stru.RuleEntry, count, interval, ruleID int) {
+func detectionTask(assetName, target, way string, rule stru.RuleEntry, count, interval, ruleID, entryID int) {
 	// 内部计数器，用于判断是否触发报警
 	var errorCount int = 0
 	uri := "/api/v1/query"
 	encodedQuery := url.QueryEscape(rule.Expr) // URL 编码
-	urlWithQuery := fmt.Sprintf("%s?query=%s", asset+uri, encodedQuery)
+	urlWithQuery := fmt.Sprintf("%s?query=%s", asset.GetAsset(assetName)+uri, encodedQuery)
 	log.Debug(urlWithQuery)
 	for {
 		var lock bool = false
@@ -86,10 +86,12 @@ func detectionTask(asset, target, way string, rule stru.RuleEntry, count, interv
 		if errorCount >= count {
 			log.Debug("返回告警内容", urlWithQuery)
 			var trigger = stru.AlarmTrigger{
+				AssetName:     assetName,
 				AlerterTarget: target,
 				AlerterWay:    way,
 				Entry:         rule,
-				ID:            ruleID,
+				RuleID:        ruleID,
+				EntryID:       entryID,
 				Time:          time.Now(),
 			}
 			if len(respData.Data.Result) != 0 {
